@@ -1,0 +1,30 @@
+name: 世纪华通新闻简报
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 北京时间10:00（UTC+8）
+    - cron: '0 5 * * *'   # 北京时间13:00（UTC+8）
+  workflow_dispatch:      # 手动触发
+
+jobs:
+  generate-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+    
+    - name: 设置Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: 安装依赖
+      run: |
+        pip install requests beautifulsoup4 akshare
+    
+    - name: 生成并推送简报
+      env:
+        KIMI_API_KEY: ${{ secrets.KIMI_API_KEY }}
+        DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
+      run: python news_bot.py
